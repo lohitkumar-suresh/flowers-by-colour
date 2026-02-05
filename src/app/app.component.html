@@ -1,51 +1,92 @@
-<div class="container">
-  <header>
-    <h1>{{ title }}</h1>
-    <p class="subtitle">Enjoy beautiful flower photos. Filter by your favourite colour.</p>
-  </header>
+<div class="min-h-dvh text-text bg-[radial-gradient(1200px_800px_at_10%_0%,#0f1520,#0b0f14)]">
+  <div class="max-w-[1100px] mx-auto px-4 py-8">
+    <header class="mb-4">
+      <h1 class="m-0 text-3xl font-bold tracking-tight">{{ title }}</h1>
+      <p class="m-0 text-muted">Enjoy beautiful flower photos. Filter by your favourite colour.</p>
+    </header>
 
-  <section class="controls">
-    <div class="filters" role="group" aria-label="Filter by colour">
-      <button
-        *ngFor="let f of filters"
-        (click)="onFilterClick(f.key)"
-        [class.active]="selectedFilter === f.key"
-        class="chip"
-        type="button"
-      >
-        {{ f.label }}
-      </button>
-    </div>
-
-    <div class="counts">
-      <span *ngIf="!error">
-        Showing <strong>{{ displayedCount }}</strong>
-        of <strong>{{ total }}</strong> results
-        <span *ngIf="pages > 1"> (page {{ page }} of {{ pages }})</span>
-      </span>
-      <span *ngIf="error" class="error">{{ error }}</span>
-    </div>
-  </section>
-
-  <section class="grid" aria-live="polite">
-    <ng-container *ngIf="photos?.length; else empty">
-      <article class="card" *ngFor="let p of photos; ">
-        <img [src]="p.url" [alt]="p.alt" loading="lazy" />
-        <h3 class="title" [title]="p.title">{{ p.title || 'Flower' }}</h3>
-      </article>
-    </ng-container>
-
-    <ng-template #empty>
-      <div class="empty" *ngIf="!loading && !error">
-        No photos yet. Try a different filter.
+    <!-- Controls -->
+    <section class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by colour">
+        @for (f of filters; track f.key) {
+          <button
+            type="button"
+            (click)="onFilterClick(f.key)"
+            class="rounded-full px-3 py-2 font-semibold transition
+                   bg-chip text-text border border-transparent
+                   hover:-translate-y-[1px] hover:cursor-pointer"
+            [ngClass]="selectedFilter === f.key ? colorClass[f.key] : null">
+            {{ f.label }}
+          </button>
+        }
       </div>
-    </ng-template>
-  </section>
 
-  <section class="actions">
-    <button type="button" (click)="onMore()" [disabled]="!canLoadMore" class="more-btn">
-      <span *ngIf="!loading">More flowers</span>
-      <span *ngIf="loading">Loading…</span>
-    </button>
-  </section>
+      <div class="text-muted">
+        @if (error$ | async; as error) {
+          <span class="text-error">{{ error }}</span>
+        } @else {
+          @let shown = (displayedCount$ | async);
+          @let total = (total$ | async);
+          @let pages = (pages$ | async);
+          @let page  = (page$  | async);
+
+          <span>
+            Showing <strong>{{ shown ?? 0 }}</strong>
+            of <strong>{{ total ?? 0 }}</strong> results
+            @if (pages && page && pages > 1) {
+              (page {{ page }} of {{ pages }})
+            }
+          </span>
+        }
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 my-4" aria-live="polite">
+      @let photos = (photos$ | async);
+      @if (photos?.length) {
+        @for (p of photos; track p.id) {
+          <article class="bg-card border border-[#1d2430] rounded-xl overflow-hidden flex flex-col">
+            <img
+              [src]="p.url"
+              [alt]="p.alt"
+              loading="lazy"
+              class="w-full h-[220px] object-cover bg-[#0d1117]" />
+            <h3 class="m-3 text-[0.95rem] font-semibold text-text truncate" [title]="p.title">
+              {{ p.title || 'Flower' }}
+            </h3>
+          </article>
+        }
+      } @else {
+        @if (!(loading$ | async) && !(error$ | async)) {
+          <div class="p-8 text-center text-muted">
+            No photos yet. Try a different filter.
+          </div>
+        }
+      }
+    </section>
+
+    <!-- Actions -->
+    <section class="flex justify-center">
+      @let canMore = (canLoadMore$ | async);
+      @let loading = (loading$ | async);
+
+      <button
+        type="button"
+        (click)="onMore()"
+        [disabled]="!canMore"
+        class="min-w-[180px] rounded-md font-bold px-4 py-3
+               bg-gradient-to-b from-[#2b3342] to-[#1b2431]
+               text-text border border-[#2b3342]
+               transition hover:-translate-y-[1px]
+               hover:shadow-[0_4px_20px_rgba(76,201,240,0.15)]
+               disabled:opacity-60 disabled:cursor-not-allowed">
+        @if (!loading) {
+          <span>More flowers</span>
+        } @else {
+          <span>Loading…</span>
+        }
+      </button>
+    </section>
+  </div>
 </div>

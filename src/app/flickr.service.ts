@@ -15,7 +15,7 @@ export class FlickrService {
   private readonly perPage = environment.perPage;
 
   private buildImageUrl(p: FlickrPhoto): string {
-    // IMPORTANT: include the '/' between {server} and {id}
+
     return `https://farm${p.farm}.staticflickr.com/${p.server}/${p.id}_${p.secret}.jpg`;
   }
 

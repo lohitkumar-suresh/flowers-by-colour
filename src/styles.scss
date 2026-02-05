@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+@use "tailwindcss";
+
+/* Define the tokens Tailwind should generate utilities for */
+@theme {
+  --color-text: #e6eef7;
+  --color-muted: #9fb1c3;
+  --color-accent: #4cc9f0;
+  --color-card: #121821;
+  --color-chip: #1b2431;
+  --color-chip-active: #2e3a4a;
+  --color-error: #ff6b6b;
+  --color-bg: #0b0f14;
+}
